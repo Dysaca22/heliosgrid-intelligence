@@ -1,0 +1,65 @@
+# =================================================================
+# .gitignore para Proyectos de Datos con Python y Docker
+# =================================================================
+
+# -----------------------------------------------------------------
+# Regla #1: NUNCA VERSIONAR SECRETOS
+# El archivo .env contiene nuestras contraseñas y configuraciones sensibles.
+# Comprometer este archivo es comprometer todo el sistema.
+.env
+
+# -----------------------------------------------------------------
+# Regla #2: IGNORAR ARTEFACTOS GENERADOS POR PYTHON
+# Archivos de caché y bytecode que Python crea al ejecutarse.
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# -----------------------------------------------------------------
+# Regla #3: IGNORAR ENTORNOS VIRTUALES Y DEPENDENCIAS LOCALES
+# Versionamos requirements.txt, no las librerías descargadas.
+venv/
+.venv/
+env/
+.env/
+pip-cache/
+*.egg-info/
+
+# -----------------------------------------------------------------
+# Regla #4: MANTENER EL REPOSITORIO LIMPIO DE "RUIDO"
+# Archivos específicos del sistema operativo, IDEs y editores de código.
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# -----------------------------------------------------------------
+# REGLAS ESPECÍFICAS DE PROYECTOS DE DATOS Y DOCKER
+
+# Ignorar los datos crudos. El repositorio debe contener el CÓDIGO para
+# procesar los datos, no los datos en sí (especialmente si son grandes).
+# Es mejor incluir un README que explique cómo obtenerlos.
+producer/data/
+
+# Ignorar los logs generados por Airflow y otros servicios.
+# Son artefactos de ejecución, no código fuente.
+logs/*
+# ¡Excepción! No ignores el archivo .gitkeep. Esto nos permite
+# mantener la carpeta 'logs/' vacía en el repositorio, preservando
+# la estructura de carpetas que definimos.
+!logs/.gitkeep
+
+# Archivos de construcción de Docker que pueden quedar localmente
+docker-compose.override.yml
