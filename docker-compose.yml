@@ -81,7 +81,7 @@ services:
                 condition: service_healthy
         environment:
             - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-            - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
+            - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
             - AIRFLOW__CORE__LOAD_EXAMPLES=false
         command: bash -c "airflow db init && airflow users create --role Admin --username admin --password admin --email admin@example.com --firstname Admin --lastname User"
         networks:
@@ -106,7 +106,7 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
         environment:
             - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-            - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
+            - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
             - KAFKA_PORT=${KAFKA_PORT}
             - DATA_FILE_PATH=${DATA_FILE_PATH}
         command: airflow webserver
@@ -135,7 +135,7 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
         environment:
             - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-            - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
+            - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
             - KAFKA_PORT=${KAFKA_PORT}
             - DATA_FILE_PATH=${DATA_FILE_PATH}
         command: scheduler
