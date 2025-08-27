@@ -112,6 +112,7 @@ services:
         networks:
             - helios_net
 
+    # 4. Productor y Consumidor: Los actores principales en la escena de datos
     producer:
         build:
             context: ./producer
@@ -125,6 +126,26 @@ services:
                 condition: service_completed_successfully
         networks:
             - helios_net
+
+    consumer:
+        build:
+            context: ./consumer
+        container_name: helios-consumer
+        restart: always
+        depends_on:
+            kafka:
+                condition: service_healthy
+            postgres:
+                condition: service_healthy
+        networks:
+            - helios_net
+        environment:
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            - KAFKA_BROKER=kafka:${KAFKA_PORT}
+            - POSTGRES_USER=${POSTGRES_USER}
+            - KAFKA_TOPIC=solar-power-data
+            - POSTGRES_DB=${POSTGRES_DB}
+            - POSTGRES_HOST=postgres
 
 # Red y Volúmenes para desacoplar y persistir
 networks:

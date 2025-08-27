@@ -1,8 +1,11 @@
 import pandas as pd, numpy as np
 from kafka import KafkaProducer
 import time, logging, os, json
-from typing import List
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Environment variables
 KAFKA_BROKER_URL = os.environ.get('KAFKA_BROKER', 'kafka:9092')
 DATA_FILE_PATH = os.environ.get('DATA_FILE_PATH', 'producer/data/2022-1217132-one_axis.csv')
 
@@ -192,8 +195,8 @@ def send_df_to_kafka(list_of_records: list, producer: KafkaProducer) -> None:
     logging.info("Kafka producer closed.")
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+def main() -> None:
+    """Main function to run the data cleaning pipeline and send data to Kafka."""
     if not os.path.isfile(DATA_FILE_PATH):
         logging.info(f"The specified data file path '{DATA_FILE_PATH}' does not exist or is not a file.")
     else:
@@ -211,5 +214,9 @@ if __name__ == "__main__":
             # logging.info(f"\nCleaned data saved to '{OUTPUT_FILE_PATH}'")
         else:
             logging.info("No data to send to Kafka after cleaning.")
+
+
+if __name__ == "__main__":
+    main()
 else:
     logging.info("This script is intended to be run as the main module.")
