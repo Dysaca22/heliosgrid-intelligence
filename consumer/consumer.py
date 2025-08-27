@@ -48,19 +48,20 @@ def main() -> None:
         """
             CREATE TABLE IF NOT EXISTS solar_data (
                 id SERIAL PRIMARY KEY,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                ghi FLOAT,
+                dni FLOAT,
                 temperature FLOAT,
+                dhi FLOAT,
                 clearsky_dhi FLOAT,
                 clearsky_dni FLOAT,
                 clearsky_ghi FLOAT,
-                cloud_type INT,
-                dhi FLOAT,
-                dni FLOAT,
-                ghi FLOAT,
-                relative_humidity FLOAT,
-                solar_zenith_angle FLOAT,
-                pressure FLOAT,
+                wind_speed FLOAT,
                 wind_direction FLOAT,
-                wind_speed FLOAT
+                pressure FLOAT,
+                cloud_type INT,
+                relative_humidity FLOAT,
+                solar_zenith_angle FLOAT
             );
         """
     )
@@ -83,25 +84,37 @@ def main() -> None:
             cursor.execute(
                 """
                     INSERT INTO solar_data (
-                        temperature, clearsky_dhi, clearsky_dni, clearsky_ghi,
-                        cloud_type, dhi, dni, ghi, relative_humidity,
-                        solar_zenith_angle, pressure, wind_direction, wind_speed
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                        timestamp,
+                        ghi,
+                        dni,
+                        temperature,
+                        dhi,
+                        clearsky_dhi,
+                        clearsky_dni,
+                        clearsky_ghi,
+                        wind_speed,
+                        wind_direction,
+                        pressure,
+                        cloud_type,
+                        relative_humidity,
+                        solar_zenith_angle
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
                 """
             , (
-                data.get('Temperature'),
-                data.get('Clearsky DHI'),
-                data.get('Clearsky DNI'),
-                data.get('Clearsky GHI'),
-                data.get('Cloud Type'),
-                data.get('DHI'),
-                data.get('DNI'),
-                data.get('GHI'),
-                data.get('Relative Humidity'),
-                data.get('Solar Zenith Angle'),
-                data.get('Pressure'),
-                data.get('Wind Direction'),
-                data.get('Wind Speed')
+                data.get('Datetime', None),
+                data.get('GHI', None),
+                data.get('DNI', None),
+                data.get('Temperature', None),
+                data.get('DHI', None),
+                data.get('Clearsky DHI', None),
+                data.get('Clearsky DNI', None),
+                data.get('Clearsky GHI', None),
+                data.get('Wind Speed', None),
+                data.get('Wind Direction', None),
+                data.get('Pressure', None),
+                data.get('Cloud Type', None),
+                data.get('Relative Humidity', None),
+                data.get('Solar Zenith Angle', None)
             ))
             conn.commit()
             logging.info("Data inserted successfully into PostgreSQL")

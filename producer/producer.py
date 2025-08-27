@@ -68,7 +68,7 @@ def create_datetime_index(df: pd.DataFrame) -> pd.DataFrame:
     time_cols = ['Year', 'Month', 'Day', 'Hour', 'Minute']
     if all(col in df_copy.columns for col in time_cols):
         df_copy['Datetime'] = pd.to_datetime(df_copy[time_cols])
-        df_copy.set_index('Datetime', inplace=True)
+        # df_copy.set_index('Datetime', inplace=True)
         logging.info("DatetimeIndex created and set successfully.")
     else:
         logging.info("Warning: Not all time columns found; skipping DatetimeIndex creation.")
@@ -182,6 +182,7 @@ def send_df_to_kafka(list_of_records: list, producer: KafkaProducer) -> None:
     logging.info(f"Starting to send {len(list_of_records)} records to Kafka topic 'solar-power-data'.")
     for record in list_of_records:
         try:
+            record['Datetime'] = record['Datetime'].isoformat()
             producer.send('solar-power-data', value=record)
             logging.info(f"Send record: {record}")
             time.sleep(1)
