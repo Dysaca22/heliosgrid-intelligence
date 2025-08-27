@@ -27,7 +27,7 @@ services:
         networks:
             - helios_net
         environment:
-            ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_PORT}
+            ZOOKEEPER_CLIENT_PORT: 2181
             ZOOKEEPER_TICK_TIME: 2000
 
     kafka:
@@ -41,12 +41,34 @@ services:
             - "${KAFKA_PORT}:${KAFKA_PORT}"
         environment:
             KAFKA_BROKER_ID: 1
-            KAFKA_ZOOKEEPER_CONNECT: "zookeeper:${ZOOKEEPER_PORT}"
-            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:${KAFKA_PORT},PLAINTEXT_INTERNAL://kafka:29092
+            KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:${KAFKA_PORT}
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
             KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
             KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+        healthcheck:
+            test: ["CMD", "cub", "kafka-ready", "-b", "localhost:9092", "1", "1"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    
+    kafka-setup:
+        image: confluentinc/cp-kafka:7.3.0
+        container_name: helios-kafka-setup
+        depends_on:
+            kafka:
+                condition: service_healthy
+        networks:
+            - helios_net
+        command: >
+            bash -c "
+                echo 'Esperando a que Kafka esté listo...' &&
+                cub kafka-ready -b kafka:9092 1 30 &&
+                echo 'Kafka listo. Creando topic...' &&
+                kafka-topics --create --if-not-exists --topic solar-power-data --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
+                echo 'Topic creado exitosamente.'
+            "
 
     # 3. Orquestador: El director de la sinfonía de datos
     # Esta configuración se basa en la oficial de Airflow
@@ -55,7 +77,8 @@ services:
         image: apache/airflow:2.7.1
         container_name: helios-airflow-init
         depends_on:
-            - postgres
+            postgres:
+                condition: service_healthy
         environment:
             - AIRFLOW__CORE__EXECUTOR=LocalExecutor
             - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
@@ -89,7 +112,19 @@ services:
         networks:
             - helios_net
 
-    # Añadiremos airflow-scheduler y otros componentes cuando sea necesario para mantener la simplicidad inicial.
+    producer:
+        build:
+            context: ./producer
+        container_name: helios-producer
+        environment:
+            - KAFKA_BROKER=kafka:${KAFKA_PORT}
+            - DATA_FILE_PATH=${DATA_FILE_PATH}
+        restart: on-failure
+        depends_on:
+            kafka-setup:
+                condition: service_completed_successfully
+        networks:
+            - helios_net
 
 # Red y Volúmenes para desacoplar y persistir
 networks:

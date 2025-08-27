@@ -83,3 +83,17 @@ El sistema funcionará como un pipeline de datos continuo, desde la generación 
 - **Fase 5: Modelado Predictivo**
     - Integrar el entrenamiento de un modelo de series temporales (ej. ARIMA, Prophet) como una tarea en el DAG de Airflow.
     - El script leerá datos históricos de PostgreSQL, generará predicciones y las guardará en una tabla dedicada. El dashboard se actualizará para incluir estas predicciones.
+
+
+## Datos
+
+Para el desarrollo de este proyecto, se utilizará una combinación de datos históricos reales y datos simulados en tiempo real.
+
+### Fuente de Datos y Simulación
+
+*   **Datos Históricos (Para Simulación y Entrenamiento):** Se utilizarán datos del **National Solar Radiation Database (NSRDB)**, proporcionado por el National Renewable Energy Laboratory (NREL) de EE. UU. Este conjunto de datos es una referencia estándar en la industria y contiene información meteorológica y de irradiancia solar con alta resolución temporal y espacial. Estos datos son fundamentales para entrenar el modelo predictivo y para informar la lógica de simulación, asegurando que los datos generados sean realistas.
+    *   **Enlaces de referencia:**
+        *   [NSRDB Data Viewer](https://nsrdb.nrel.gov/data-viewer)
+        *   [NSRDB US Data Sets](https://nsrdb.nrel.gov/data-sets/us-data)
+
+*   **Datos en Tiempo Real (Simulados):** El pipeline de ingesta será alimentado por un script de Python (`producer.py`) que simula los sensores de un parque solar. Este script generará datos sintéticos que imitan las características y patrones de los datos reales, asegurando un entorno de desarrollo realista para probar el sistema de ingesta y procesamiento en tiempo real.
