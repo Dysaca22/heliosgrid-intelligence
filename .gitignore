@@ -56,10 +56,14 @@ producer/data/
 # Ignorar los logs generados por Airflow y otros servicios.
 # Son artefactos de ejecución, no código fuente.
 logs/*
+dags/*
+plugins/*
 # ¡Excepción! No ignores el archivo .gitkeep. Esto nos permite
 # mantener la carpeta 'logs/' vacía en el repositorio, preservando
 # la estructura de carpetas que definimos.
 !logs/.gitkeep
+!dags/.gitkeep
+!plugins/.gitkeep
 
 # Archivos de construcción de Docker que pueden quedar localmente
 docker-compose.override.yml
